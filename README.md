@@ -6,7 +6,7 @@ Clone the repo and test how it looks:
 ```
 npm install
 npm run build
-open dist/index.html
+open dist/ambients.html
 ``` 
 
 
