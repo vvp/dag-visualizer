@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="main.js"></script>
+
+    <!-- Define inlined JavaScript -->
+    <script type="text/javascript">
+        window.onload = function() {
+
+
+
+            let graph = main.dag('myCanvas')
+
+            let browns = graph.coloredSubdag('#75570d', '#f5bd73')
+            let programCreate = browns.square('program', 'create')
+            let callOut_ = browns.circle('call', 'out_')
+            let concatIn_ = browns.circle('string_concat', 'in_')
+            browns.connect(programCreate, callOut_, concatIn_)
+
+
+            let callCreate 	= browns.square('call', 'create')
+            let callOut 	= browns.circle('program', 'out')
+            let callIn 		= browns.circle('string_concat', 'in')
+            browns.connect(programCreate, callCreate, callOut, callIn)
+            browns.ref(callOut, callOut_)
+
+            let greens = graph.coloredSubdag('#09623c', '#7fc7a8')
+            let concatCreate = greens.square('string_concat', 'create')
+            let callIn_ = greens.circle('call', 'in_')
+            let callOpen = greens.circle('call', 'open')
+            let callOpen_ 	= greens.circle('', 'open_')
+            let returnCreate = greens.square('return', 'create')
+            let returnOpen_ = greens.circle('', 'open_')
+            let programIn = greens.circle('program', 'in')
+            let returnOpen = greens.circle('return', 'open')
+            greens.connect(concatCreate, callIn_, callOpen, returnOpen)
+            greens.connect(callIn, callOpen_, returnCreate, returnOpen_, programIn)
+            greens.ref(callIn, callIn_)
+            greens.ref(callOpen_, callOpen)
+            greens.ref(returnOpen_, returnOpen)
+            greens.ref(returnOpen, programIn)
+            browns.ref(programIn, concatIn_)
+
+
+            graph.render()
+        }
+    </script>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="myCanvas" width="500px" height="1000px"></canvas>
+</body>
+</html>
