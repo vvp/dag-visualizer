@@ -5,10 +5,7 @@
 
     <!-- Define inlined JavaScript -->
     <script type="text/javascript">
-        window.onload = function() {
-
-
-
+        window.onload = function () {
             let graph = main.dag('myCanvas')
 
             let browns = graph.coloredSubdag('#75570d', '#f5bd73')
@@ -18,9 +15,9 @@
             browns.connect(programCreate, callOut_, concatIn_)
 
 
-            let callCreate 	= browns.square('call', 'create')
-            let callOut 	= browns.circle('program', 'out')
-            let callIn 		= browns.circle('string_concat', 'in')
+            let callCreate = browns.square('call', 'create')
+            let callOut = browns.circle('program', 'out')
+            let callIn = browns.circle('string_concat', 'in')
             browns.connect(programCreate, callCreate, callOut, callIn)
             browns.ref(callOut, callOut_)
 
@@ -28,7 +25,7 @@
             let concatCreate = greens.square('string_concat', 'create')
             let callIn_ = greens.circle('call', 'in_')
             let callOpen = greens.circle('call', 'open')
-            let callOpen_ 	= greens.circle('', 'open_')
+            let callOpen_ = greens.circle('', 'open_')
             let returnCreate = greens.square('return', 'create')
             let returnOpen_ = greens.circle('', 'open_')
             let programIn = greens.circle('program', 'in')
@@ -40,7 +37,6 @@
             greens.ref(returnOpen_, returnOpen)
             greens.ref(returnOpen, programIn)
             browns.ref(programIn, concatIn_)
-
 
             graph.render()
         }

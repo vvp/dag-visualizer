@@ -10,9 +10,11 @@ let dag = (canvasId) => {
     let node = new paper.Layer()
     let labels = new paper.Layer()
 
-    let g = new dagre.graphlib.Graph();
-    g.setGraph({marginx: 50, marginy:50, rankdir: 'TB', align: 'UL'})
-    g.setDefaultEdgeLabel(function() { return {}; })
+    let g = new dagre.graphlib.Graph()
+    g.setGraph({marginx: 50, marginy: 50, rankdir: 'TB', align: 'UL'})
+    g.setDefaultEdgeLabel(function () {
+        return {}
+    })
 
     let items = []
     let size = 50
@@ -22,22 +24,22 @@ let dag = (canvasId) => {
         let itempos = item.position
 
         let typeLabel = new paper.PointText({
-            position: new paper.Point(itempos.x, itempos.y+4.5),
+            position: new paper.Point(itempos.x, itempos.y + 4.5),
             fontWeight: 'bold',
             justification: 'center',
             content: graphItem.type,
             fillColor: graphItem.fg,
             fontFamily: 'sans serif',
-            fontSize: 14
+            fontSize: 14,
         })
         let nameLabel = new paper.PointText({
-            position: new paper.Point(itempos.x, itempos.y-size/2-labelMargin),
+            position: new paper.Point(itempos.x, itempos.y - size / 2 - labelMargin),
             fontWeight: 'bold',
             justification: 'center',
             content: graphItem.name,
             fillColor: graphItem.fg,
             fontFamily: 'sans serif',
-            fontSize: 14
+            fontSize: 14,
         })
         let labelBg = new paper.Path.Rectangle(nameLabel.strokeBounds)
         labelBg.fillColor = 'black'
@@ -46,7 +48,7 @@ let dag = (canvasId) => {
     }
     let _drawCircle = (item, x, y) => {
         node.activate()
-        let c = new paper.Path.Circle(new paper.Point(x,y), size/2)
+        let c = new paper.Path.Circle(new paper.Point(x, y), size / 2)
         c.fillColor = item.bg
 
         _drawLabel(item, c)
@@ -57,8 +59,8 @@ let dag = (canvasId) => {
         let rect = new paper.Rectangle()
         rect.size = new paper.Size(size, size)
         rect.center = new paper.Point(x, y)
-        let square = new paper.Path.Rectangle(rect);
-        square.fillColor = item.bg;
+        let square = new paper.Path.Rectangle(rect)
+        square.fillColor = item.bg
 
         _drawLabel(item, square)
         return square
@@ -70,11 +72,11 @@ let dag = (canvasId) => {
             let itemIndex = Number(nodeId.substring(1))
             let item = items[itemIndex]
             let node = g.node(nodeId)
-            switch( item.shape ) {
-                case "circle":
+            switch (item.shape) {
+                case 'circle':
                     _drawCircle(item, node.x, node.y)
                     break
-                case "square":
+                case 'square':
                     _drawSquare(item, node.x, node.y)
                     break
             }
@@ -87,13 +89,12 @@ let dag = (canvasId) => {
 
             let graphEdge = g.edge(edge)
             let points = graphEdge.points
-            let ref = new paper.Path();
+            let ref = new paper.Path()
             ref.strokeColor = second.bg
             if (graphEdge.edgeType === 'dotted') {
                 ref.strokeWidth = '5'
-                ref.dashArray = [5,3]
-            }
-            else {
+                ref.dashArray = [5, 3]
+            } else {
                 ref.strokeWidth = '8'
             }
             points.forEach((point) => {
@@ -108,23 +109,27 @@ let dag = (canvasId) => {
         coloredSubdag: (bg, fg) => {
 
             let _square = (name, type) => {
-                let item = {id: "#" + items.length.toString(),
-                    shape: "square",
-                    fg: fg, bg: bg, name: name, type: type}
+                let item = {
+                    id: '#' + items.length.toString(),
+                    shape: 'square',
+                    fg: fg, bg: bg, name: name, type: type,
+                }
                 items.push(item)
-                g.setNode(item.id, {label: item.name, width: size/2, height: size/2})
+                g.setNode(item.id, {label: item.name, width: size / 2, height: size / 2})
                 return item
             }
             let _circle = (name, type) => {
-                let item = {id: "#" + items.length.toString(), shape: "circle",
-                    fg: fg, bg: bg, name: name, type: type}
+                let item = {
+                    id: '#' + items.length.toString(), shape: 'circle',
+                    fg: fg, bg: bg, name: name, type: type,
+                }
                 items.push(item)
-                g.setNode(item.id, {label: item.name, width: size/2, height: size/2})
+                g.setNode(item.id, {label: item.name, width: size / 2, height: size / 2})
                 return item
             }
             let _connect = (first, second, ...more) => {
                 g.setEdge(first.id, second.id, {edgeType: 'solid'})
-                let previous = second.id;
+                let previous = second.id
                 more.forEach((item) => {
                     let id = item.id
                     g.setEdge(previous, id, {edgeType: 'solid'})
@@ -140,12 +145,12 @@ let dag = (canvasId) => {
                 square: _square,
                 circle: _circle,
                 connect: _connect,
-                ref: _ref
+                ref: _ref,
             }
-        }
+        },
     }
 }
 
 module.exports = {
-    dag: dag
+    dag: dag,
 }
