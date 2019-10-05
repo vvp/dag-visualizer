@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="visualizer.js"></script>
 
     <!-- Define inlined JavaScript -->
     <script type="text/javascript">
         window.onload = function () {
-            let graph = main.dag('myCanvas')
+            let graph = visualizer.dag('myCanvas')
 
             let browns = graph.coloredSubdag('#75570d', '#f5bd73')
             let programCreate = browns.square('program', 'create')
