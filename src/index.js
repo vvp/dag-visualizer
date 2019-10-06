@@ -1,156 +1,81 @@
-const paper = require('paper')
-const dagre = require('dagre')
+const UI = require('./drawing-ui.js')
+const Layout = require('./graphmodel.js')
 
 
-let dag = (canvasId) => {
-    let canvas = document.getElementById(canvasId)
-    paper.setup(canvas)
+class Main {
+    _groups = []
 
-    let edges = new paper.Layer()
-    let node = new paper.Layer()
-    let labels = new paper.Layer()
+    constructor(canvasId) {
+        this._layout = new Layout()
+        this._drawingUI = new UI(canvasId, this._layout)
 
-    let g = new dagre.graphlib.Graph()
-    g.setGraph({marginx: 50, marginy: 50, rankdir: 'TB', align: 'UL'})
-    g.setDefaultEdgeLabel(function () {
-        return {}
-    })
-
-    let items = []
-    let size = 50
-    let labelMargin = 5
-    let _drawLabel = (graphItem, item) => {
-        labels.activate()
-        let itempos = item.position
-
-        let typeLabel = new paper.PointText({
-            position: new paper.Point(itempos.x, itempos.y + 4.5),
-            fontWeight: 'bold',
-            justification: 'center',
-            content: graphItem.type,
-            fillColor: graphItem.fg,
-            fontFamily: 'sans serif',
-            fontSize: 14,
-        })
-        let nameLabel = new paper.PointText({
-            position: new paper.Point(itempos.x, itempos.y - size / 2 - labelMargin),
-            fontWeight: 'bold',
-            justification: 'center',
-            content: graphItem.name,
-            fillColor: graphItem.fg,
-            fontFamily: 'sans serif',
-            fontSize: 14,
-        })
-        let labelBg = new paper.Path.Rectangle(nameLabel.strokeBounds)
-        labelBg.fillColor = 'black'
-        labelBg.opacity = '0.4'
-        labelBg.insertBelow(nameLabel)
     }
-    let _drawCircle = (item, x, y) => {
-        node.activate()
-        let c = new paper.Path.Circle(new paper.Point(x, y), size / 2)
-        c.fillColor = item.bg
 
-        _drawLabel(item, c)
-        return c
+    group() {
+        let group = new Group(this._layout)
+        this._groups.push(group)
+        return group
     }
-    let _drawSquare = (item, x, y) => {
-        node.activate()
-        let rect = new paper.Rectangle()
-        rect.size = new paper.Size(size, size)
-        rect.center = new paper.Point(x, y)
-        let square = new paper.Path.Rectangle(rect)
-        square.fillColor = item.bg
 
-        _drawLabel(item, square)
-        return square
+    render() {
+        this._drawingUI.render()
     }
-    let _render = () => {
-        dagre.layout(g)
 
-        g.nodes().forEach((nodeId) => {
-            let itemIndex = Number(nodeId.substring(1))
-            let item = items[itemIndex]
-            let node = g.node(nodeId)
-            switch (item.shape) {
-                case 'circle':
-                    _drawCircle(item, node.x, node.y)
-                    break
-                case 'square':
-                    _drawSquare(item, node.x, node.y)
-                    break
-            }
-        })
+}
 
-        edges.activate()
-        g.edges().forEach((edge) => {
-            let first = items[Number(edge.v.substring(1))]
-            let second = items[Number(edge.w.substring(1))]
+class Group {
+    _layout
+    _rendererFunc
 
-            let graphEdge = g.edge(edge)
-            let points = graphEdge.points
-            let ref = new paper.Path()
-            ref.strokeColor = second.bg
-            if (graphEdge.edgeType === 'dotted') {
-                ref.strokeWidth = '5'
-                ref.dashArray = [5, 3]
-            } else {
-                ref.strokeWidth = '8'
-            }
-            points.forEach((point) => {
-                ref.add(new paper.Point(point.x, point.y))
-            })
-        })
-        // Draw the view now:
-        paper.view.draw()
+    constructor(layout) {
+        this._layout = layout
     }
-    return {
-        render: _render,
-        coloredSubdag: (bg, fg) => {
 
-            let _square = (name, type) => {
-                let item = {
-                    id: '#' + items.length.toString(),
-                    shape: 'square',
-                    fg: fg, bg: bg, name: name, type: type,
-                }
-                items.push(item)
-                g.setNode(item.id, {label: item.name, width: size / 2, height: size / 2})
-                return item
-            }
-            let _circle = (name, type) => {
-                let item = {
-                    id: '#' + items.length.toString(), shape: 'circle',
-                    fg: fg, bg: bg, name: name, type: type,
-                }
-                items.push(item)
-                g.setNode(item.id, {label: item.name, width: size / 2, height: size / 2})
-                return item
-            }
-            let _connect = (first, second, ...more) => {
-                g.setEdge(first.id, second.id, {edgeType: 'solid'})
-                let previous = second.id
-                more.forEach((item) => {
-                    let id = item.id
-                    g.setEdge(previous, id, {edgeType: 'solid'})
-                    previous = id
-                })
-            }
-            let _ref = (first, second) => {
-                g.setEdge(first.id, second.id, {edgeType: 'dotted'})
-            }
+    node(type, name, ...refs) {
+        let dagNode = new DagNode(type, name, this)
+        this._layout.addNode(dagNode)
+        refs.forEach(ref => dagNode.addPrimaryEdge(ref))
+        return dagNode
+    }
 
-
-            return {
-                square: _square,
-                circle: _circle,
-                connect: _connect,
-                ref: _ref,
-            }
-        },
+    render(rendererFunc) {
+        this._rendererFunc = rendererFunc;
     }
 }
 
-module.exports = {
-    dag: dag,
+class DagNode {
+    type
+    name
+
+    constructor(type, name, group) {
+        this.type = type
+        this.name = name
+        this.group = group
+    }
+
+    addPrimaryEdge(dagNode) {
+        this.group._layout.addEdge(dagNode, this, 'primary')
+    }
+
+    addSecondaryEdge(dagNode) {
+        this.group._layout.addEdge(dagNode, this, 'secondary')
+    }
+
+
+    link(...refs) {
+        refs.forEach(ref => this.addSecondaryEdge(ref))
+    }
+
+    render() {
+        this.ui = {
+            name: this.name,
+            type: this.type,
+        }
+        Object.assign(this.ui, this.group._rendererFunc(this))
+        return this
+    }
+
 }
+
+
+module.exports = Main

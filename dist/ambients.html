@@ -2,41 +2,50 @@
 <html>
 <head>
     <script type="text/javascript" src="visualizer.js"></script>
-
-    <!-- Define inlined JavaScript -->
     <script type="text/javascript">
         window.onload = function () {
-            let graph = visualizer.dag('myCanvas')
+            let graph = new Visualizer('myCanvas')
 
-            let browns = graph.coloredSubdag('#75570d', '#f5bd73')
-            let programCreate = browns.square('program', 'create')
-            let callOut_ = browns.circle('call', 'out_')
-            let concatIn_ = browns.circle('string_concat', 'in_')
-            browns.connect(programCreate, callOut_, concatIn_)
+            let squaresCircles = (bg, fg) => (node) => {
+                return {
+                    bg: bg,
+                    fg: fg,
+                    shape: node.type === 'create' ? 'square' : 'circle'
+                }
+            }
+            let browns = graph.group()
+            let a1 = browns.node('create', 'program')
+            let b1 = browns.node('out_', 'call', a1)
+            let c1 = browns.node('in_', 'string_concat', b1)
+            let d1 = browns.node('create', 'call', a1)
+            let e1 = browns.node('out', 'program', d1)
+            let f1 = browns.node('in', 'string_concat', e1)
+            let g1 = browns.node('create', 'func', a1)
+            let h1 = browns.node('in_', 'string_concat', g1)
+            let i1 = browns.node('open', 'string_concat', h1)
+            browns.render(squaresCircles('#75570d', '#f5bd73'))
 
+            let greens = graph.group()
+            let a2 = greens.node('create', 'string_concat')
+            let b2 = greens.node('in_', 'call', a2)
+            let c2 = greens.node('open', 'call', b2)
+            let d2 = greens.node('open', 'return', c2)
+            let e2 = greens.node('open_', '', d2)
+            let f2 = greens.node('open_', '', f1)
+            let g2 = greens.node('create', 'return', f2)
+            let h2 = greens.node('open_', '', g2)
+            let i2 = greens.node('in', 'program', h2)
+            let j2 = greens.node('in', 'func', i2)
+            greens.render(squaresCircles('#09623c', '#7fc7a8'))
 
-            let callCreate = browns.square('call', 'create')
-            let callOut = browns.circle('program', 'out')
-            let callIn = browns.circle('string_concat', 'in')
-            browns.connect(programCreate, callCreate, callOut, callIn)
-            browns.ref(callOut, callOut_)
-
-            let greens = graph.coloredSubdag('#09623c', '#7fc7a8')
-            let concatCreate = greens.square('string_concat', 'create')
-            let callIn_ = greens.circle('call', 'in_')
-            let callOpen = greens.circle('call', 'open')
-            let callOpen_ = greens.circle('', 'open_')
-            let returnCreate = greens.square('return', 'create')
-            let returnOpen_ = greens.circle('', 'open_')
-            let programIn = greens.circle('program', 'in')
-            let returnOpen = greens.circle('return', 'open')
-            greens.connect(concatCreate, callIn_, callOpen, returnOpen)
-            greens.connect(callIn, callOpen_, returnCreate, returnOpen_, programIn)
-            greens.ref(callIn, callIn_)
-            greens.ref(callOpen_, callOpen)
-            greens.ref(returnOpen_, returnOpen)
-            greens.ref(returnOpen, programIn)
-            browns.ref(programIn, concatIn_)
+            b2.link(f1)
+            b1.link(e1)
+            c1.link(i2)
+            c2.link(f2)
+            d2.link(h2)
+            h1.link(j2)
+            i2.link(d2)
+            i1.link(e2)
 
             graph.render()
         }
