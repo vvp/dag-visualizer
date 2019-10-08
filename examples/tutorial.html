@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="visualizer.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            // initialize Visualizer with the id of the canvas- HTML element
+            let graph = new Visualizer('myCanvas')
+
+            // nodes are organized in a group for collective rendering
+            let group = graph.group()
+            let otherGroup = graph.group()
+
+            // renderer can choose a different rendering based on node-data, and each group can
+            // have separate renderers
+            let renderer = (node) => {
+                switch (node.type) {
+                    case 'A':
+                        return { bg: '#880000', fg: '#ff0000', shape: 'square' }
+                    case 'B':
+                        return { bg: '#008800', fg: '#00ff00', shape: 'circle' }
+                }
+            }
+            group.render(renderer)
+            otherGroup.render(renderer)
+
+            // nodes are created via a group, by passing a type and a name, and an optional
+            // primary link
+            let first = group.node('A', '1st')
+            let second = group.node('B', '2nd', first)
+            let third = otherGroup.node('A', '3rd')
+            let fourth = otherGroup.node('B', '4th', third)
+
+            // secondary links are added separately
+            third.link(first)
+
+            // finally render the DAG onto canvas '#myCanvas'
+            graph.render()
+        }
+    </script>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="myCanvas" width="500px" height="1000px"></canvas>
+</body>
+</html>
