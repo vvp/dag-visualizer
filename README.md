@@ -72,6 +72,7 @@ DAG Visualizer builds on great work of others:
 
 ## Todo
 
+- CSS-based styling
 - More control over rendering
 - Interactions with the graph
 - Pluggable layout algorithms
