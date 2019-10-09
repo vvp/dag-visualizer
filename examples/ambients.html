@@ -47,6 +47,10 @@
             i2.link(d2)
             i1.link(e2)
 
+            graph.onClick(node => {
+                graph.highlightDAG(node)
+            })
+
             graph.render()
         }
     </script>

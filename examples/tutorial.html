@@ -34,6 +34,10 @@
             // secondary links are added separately
             third.link(first)
 
+            graph.onClick(node => {
+                graph.highlightDAG(node)
+            })
+
             // finally render the DAG onto canvas '#myCanvas'
             graph.render()
         }

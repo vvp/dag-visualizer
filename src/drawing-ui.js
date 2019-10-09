@@ -19,7 +19,12 @@ class UI {
         this._edges = new paper.Layer()
         this._node = new paper.Layer()
         this._labels = new paper.Layer()
+        this._highlight = new paper.Layer()
 
+    }
+
+    onClick(func) {
+        this._onClick = func
     }
 
     drawLabel(graphItem, item) {
@@ -95,10 +100,33 @@ class UI {
         }
     }
 
+    highlightDAG(node) {
+        this._highlight.removeChildren()
+        this._highlight.activate()
+
+        this._layout.history(node).forEach(id => {
+            let graphNode = this._layout.node(id)
+            let clone = graphNode.ui.paperShape.copyTo(this._highlight)
+            clone.opacity = '0.25'
+            clone.blendMode = 'add'
+            clone.fillColor = clone.fillColor.multiply(2.5)
+
+        })
+        paper.view.draw()
+    }
+
     render() {
         this._layout.resizeNodes(this.size / 2)
         this._layout.nodes.forEach((node) => {
-            this.drawNode(node)
+            let newShape = this.drawNode(node)
+            newShape.data = {graphNodeId: node.graphid}
+            node.ui.paperShape = newShape
+            if (this._onClick !== undefined) {
+                newShape.onClick = (mouseEvent) => {
+                    let id = mouseEvent.currentTarget.data.graphNodeId
+                    this._onClick(id)
+                }
+            }
         })
 
         this._layout.edges.forEach((edge) => {

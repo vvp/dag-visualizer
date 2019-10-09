@@ -1,3 +1,4 @@
+
 const dagre = require('dagre')
 
 class Layout {
@@ -29,11 +30,36 @@ class Layout {
         })
     }
 
+    history(source) {
+        let set = new Set()
+        this.collectHistory(set, [source])
+        return set
+    }
+
+    collectHistory(set, graphIds) {
+        if (graphIds.length == 0)
+            return
+
+        graphIds.forEach(graphId => set.add(graphId))
+        graphIds
+            .map(graphId => this._g.predecessors(graphId))
+            .forEach((parents) => {
+                this.collectHistory(set, parents)
+            })
+    }
+
+    node(id) {
+        return this._g.node(id)
+    }
+
     get nodes() {
-        dagre.layout(this._g)
-        return this._g.nodes().map(nodeId => {
-            return this._g.node(nodeId).render()
-        })
+        if (this._renderedNodes === undefined) {
+            dagre.layout(this._g)
+            this._renderedNodes = this._g.nodes().map(nodeId => {
+                return this._g.node(nodeId).render()
+            })
+        }
+        return this._renderedNodes
     }
 
     get edges() {

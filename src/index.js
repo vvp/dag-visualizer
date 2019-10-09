@@ -17,6 +17,14 @@ class Main {
         return group
     }
 
+    onClick(func) {
+        this._drawingUI.onClick(func)
+    }
+
+    highlightDAG(node) {
+        this._drawingUI.highlightDAG(node)
+    }
+
     render() {
         this._drawingUI.render()
     }
