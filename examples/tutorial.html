@@ -34,7 +34,9 @@
             // secondary links are added separately
             third.link(first)
 
+            // graph can handle click events
             graph.onClick(node => {
+                // highlight the DAG which contains all the predecessors of the node
                 graph.highlightDAG(node)
             })
 

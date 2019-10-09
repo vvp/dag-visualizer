@@ -50,6 +50,12 @@ Here's [an example](examples/tutorial.html) showing all the features:
     // secondary links are added separately
     third.link(first)
 
+    // graph can handle click events
+    graph.onClick(node => {
+        // highlight the DAG which contains all the predecessors of the node
+        graph.highlightDAG(node)
+    })
+
     // finally render the DAG onto canvas '#myCanvas'
     graph.render()
 ```
@@ -58,10 +64,12 @@ Here's how it will look like in browser:
  
 ![example1](example.png)   
 
+Try clicking the nodes!
+
 ## Examples
 
 - [`examples/example1.html`](examples/tutorial.html) - the tutorial example 
-- [`examples/ambients.html`](examples/ambients.html) - (unfinished) draft of the [Ambients protocol](https://ambients.org) execution DAG 
+- [`examples/ambients.html`](examples/ambients.html) - (unfinished) draft of the [Ambients protocol](https://ambients.org) execution model DAG, representing the causal order of algebraic reductions   
 
 ## Dependencies
 
